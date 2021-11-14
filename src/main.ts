@@ -1,15 +1,15 @@
 import "./css/style.css";
-import { Loading, MyCamera, Character } from "./Scripts";
+import { Loading, MyCamera, Character, World } from "./Scripts";
 
 import * as THREE from "three";
 
 class Main {
   public scene: THREE.Scene;
   private renderer: THREE.WebGLRenderer;
-  private MyCamera: MyCamera;
+  private MyCamera!: MyCamera;
   private Character!: Character;
   private Loading: Loading;
-  private previousRAF: number|null;
+  private previousRAF: number | null;
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -17,7 +17,6 @@ class Main {
       canvas: document.querySelector<HTMLCanvasElement>("#three-canvas")!,
       antialias: true,
     });
-    this.MyCamera = new MyCamera(this.scene);
     this.Loading = new Loading();
     this.previousRAF = null;
 
@@ -32,40 +31,67 @@ class Main {
     // Config scene
     this.scene.background = new THREE.Color(0x348c31);
 
-    // Responsive
-    window.addEventListener("resize", () => this.OnWindowResize());
+    // Loading done
+    this.Loading.manager.onLoad = () => {
+      let btn = document.querySelector<HTMLButtonElement>("button");
+      btn!.disabled = false;
+      btn?.addEventListener("click", () => {
+        this.RenderItems();
+        this.Loading.Html.RemoveLoadingBtn();
+      });
+    };
+  }
+
+  private RenderItems(): void {
+    new World(this.scene)
+    this.Character = new Character(
+      this.Loading.character,
+      this.scene,
+      this.Loading.animations
+    );
+
+    this.MyCamera = new MyCamera(this.scene, this.Character.character)
+
+    this.AddLight_(0, 5, 2);
 
     //Request animation
     this.RAF();
 
-    // Loading done
-    this.Loading.manager.onLoad = ()=>{
-      let btn = document.querySelector<HTMLButtonElement>("button");
-      btn!.disabled = false
-      btn?.addEventListener("click",()=>{this.RenderItems(); this.Loading.Html.RemoveLoadingBtn()})
-    }
-  }
+    // Responsive
+    window.addEventListener("resize", () => this.OnWindowResize());
 
-  private RenderItems(): void {
-    this.Character = new Character(this.Loading.character, this.scene, this.Loading.animations);
-    this.AddLight_(0, 5, 2);
+    //* REFERENCE A CUBE FOR TESTING PURPOSES
+    const CubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ee0 });
+    const CubeGeometry = new THREE.BoxGeometry();
+    const cube = new THREE.Mesh(CubeGeometry, CubeMaterial);
+    cube.position.set(-6, 0, 150);
+    cube.add(new THREE.AxesHelper(10));
+    this.scene.add(cube);
   }
 
   private RAF(): void {
     window.requestAnimationFrame((t) => {
-      if(this.previousRAF === null){
-        this.previousRAF = t
+      if (this.previousRAF === null) {
+        this.previousRAF = t;
       }
       this.RAF();
-      this.Step(t - this.previousRAF)
+      this.Step(t - this.previousRAF);
       this.renderer.render(this.scene, this.MyCamera.camera);
-      this.previousRAF = t
+      this.previousRAF = t;
     });
   }
-  private Step(t:number){
-    let tS = t * 0.001
-    if(this.Loading.mixer){
-      this.Loading.mixer.update(tS)
+  private Step(t: number) {
+    let tS = t * 0.001;
+    // if()
+    if (this.Character) {
+      this.Character.Update(t);
+    }
+    if (this.Loading.mixer) {
+      this.Loading.mixer.update(tS);
+    }
+    if (this.MyCamera) {
+      this.MyCamera.Update(t);
+      // this.MyCamera.
     }
   }
 

@@ -12,7 +12,7 @@ export class Loading {
   private fbxLoader: FBXLoader;
   public Html: MyHtml;
   public manager: THREE.LoadingManager;
-  public animations: IAnimation[] = []
+  public animations:IAnimation = {}
   public mixer!: THREE.AnimationMixer;
 
   constructor() {
@@ -37,8 +37,11 @@ export class Loading {
         this.fbxLoader.load("animations/Idle.fbx", (a) => {
           this.GetAnimations("Idle", a);
         });
-        this.fbxLoader.load("animations/Reaction.fbx", (a) => {
-          this.GetAnimations("Reaction", a);
+        this.fbxLoader.load("animations/Walking.fbx", (a) => {
+          this.GetAnimations("Walk", a);
+        });
+        this.fbxLoader.load("animations/Running.fbx", (a) => {
+          this.GetAnimations("Run", a);
         });
       },
     );
@@ -48,6 +51,6 @@ export class Loading {
     // const clip = this.mixer.clipAction(animation)
     const clip = animation.animations[0];
     const action = this.mixer.clipAction(clip);
-    this.animations.push({[name]:action})
+    this.animations[name] = action
   }
 }
