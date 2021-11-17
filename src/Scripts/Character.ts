@@ -22,7 +22,7 @@ export class Character {
 
   private Init(): void {
     this.character.scale.setScalar(0.1);
-    this.character.position.set(0, 0, 10);
+    this.character.position.set(0, 0, -90);
     // this.character.rotateY
     this.character.traverse((c) => {
       c.castShadow = true;
@@ -40,7 +40,7 @@ export class Character {
     // Handle movements
     // const deceleration = new THREE.Vector3(-0.01, -0.1, -0.01);
     const velocity = new THREE.Vector3(0, 0, 0);
-    const acceleration = new THREE.Vector3(1, 1, 0.1);
+    const acceleration = new THREE.Vector3(1, 1, 0.5);
     const axis = new THREE.Vector3(0,1,0) 
     const quaternion = new THREE.Quaternion()
     const rotation = this.character.quaternion.clone()
@@ -50,7 +50,7 @@ export class Character {
     // )
 
     if(this.inputs.movements.forward){
-        velocity.z += t * acceleration.z
+        velocity.z += acceleration.z
     }
     if(this.inputs.movements.backwards){
         velocity.z -= acceleration.z
@@ -60,7 +60,7 @@ export class Character {
       rotation.multiply(quaternion)
     }
     if(this.inputs.movements.sprint){
-        velocity.z *=  2
+        velocity.z *=  3
     }
     this.character.quaternion.copy(rotation)
 
@@ -69,6 +69,7 @@ export class Character {
     forward.normalize()
     forward.multiplyScalar(velocity.z)
     this.character.position.add(forward)
+    // console.log(this.character.position)
   }
 }
 

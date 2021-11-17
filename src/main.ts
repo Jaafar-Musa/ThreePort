@@ -29,7 +29,7 @@ class Main {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Config scene
-    this.scene.background = new THREE.Color(0x348c31);
+    this.scene.background = new THREE.Color(0xC6FCFF);
 
     // Loading done
     this.Loading.manager.onLoad = () => {
@@ -43,7 +43,7 @@ class Main {
   }
 
   private RenderItems(): void {
-    new World(this.scene)
+    new World(this.scene,this.Loading.Objs)
     this.Character = new Character(
       this.Loading.character,
       this.scene,
@@ -52,8 +52,8 @@ class Main {
 
     this.MyCamera = new MyCamera(this.scene, this.Character.character)
 
-    this.AddLight_(0, 5, 2);
-
+    // this.AddLight_(0, 10, 2);
+      this.scene.add(new THREE.AmbientLight(0xffffff,2))
     //Request animation
     this.RAF();
 
@@ -91,7 +91,6 @@ class Main {
     }
     if (this.MyCamera) {
       this.MyCamera.Update(t);
-      // this.MyCamera.
     }
   }
 
@@ -101,14 +100,14 @@ class Main {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  private AddLight_(...pos: number[]) {
-    const color = 0xffffff;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(pos[0], pos[1], pos[2]);
-    this.scene.add(light);
-    this.scene.add(light.target);
-  }
+  // private AddLight_(...pos: number[]) {
+  //   const color = 0xffffff;
+  //   const intensity = 1;
+  //   const light = new THREE.DirectionalLight(color, intensity);
+  //   light.position.set(pos[0], pos[1], pos[2]);
+  //   light.target.position.set(1,1,1)
+  //   this.scene.add(light);
+  // }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

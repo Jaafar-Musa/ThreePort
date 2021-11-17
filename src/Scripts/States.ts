@@ -81,13 +81,17 @@ class Walk implements IState {
   Enter(previousState:IState | undefined): void {
       let animation = this.parent.loadedAnimations["Walk"]
       if(previousState){
-        const prevAnim = this.parent.loadedAnimations[previousState.name]
-        animation.time = 0.0;
         animation.enabled = true;
-        animation.setEffectiveTimeScale(1.0);
-        animation.setEffectiveWeight(1.0);
-        animation.crossFadeFrom(prevAnim,0.5,true)
-
+        const prevAnim = this.parent.loadedAnimations[previousState.name]
+        if(previousState.name = "Run"){
+          let r= animation.getClip().duration / prevAnim.getClip().duration
+          animation.time = r * prevAnim.time
+        }else{
+          animation.time = 0.0;
+          animation.setEffectiveTimeScale(1.0);
+          animation.setEffectiveWeight(1.0);
+        }
+        animation.crossFadeFrom(prevAnim,0.1,true)
         animation.play()
       }else{
           animation.play()
@@ -109,9 +113,26 @@ class Run implements IState {
     this.parent = parent
     this.name = "Run";
   }
-  Enter(): void {
-    let animation = this.parent.loadedAnimations["Walk"]
-    animation.play()
+  Enter(previousState:IState|undefined): void {
+    let animation = this.parent.loadedAnimations["Run"]
+    
+    if(previousState){
+      animation.enabled = true
+      let prevAnim = this.parent.loadedAnimations[previousState.name]
+      if(previousState.name = "Walk"){
+        let r= animation.getClip().duration / prevAnim.getClip().duration
+        animation.time = r * prevAnim.time
+      }else{
+        animation.time = 0.0;
+        animation.setEffectiveWeight(1.0)
+        animation.setEffectiveTimeScale(1.0)
+      }
+      animation.crossFadeFrom(prevAnim,0.5,true)
+      animation.play()
+      // if(previousState.name == "Walk")
+    }else{
+      animation.play()
+    }
   }
 //   Exit(): void {}
   Update(inputs:IMovements): void {

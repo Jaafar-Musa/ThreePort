@@ -6,7 +6,9 @@ import MyHtml from "../html/Index";
 export interface IAnimation {
   [name:string]: THREE.AnimationAction
 }
-
+export interface IObjs{
+  [name:string]: THREE.Group
+}
 export class Loading {
   public character!: THREE.Group;
   private fbxLoader: FBXLoader;
@@ -14,6 +16,7 @@ export class Loading {
   public manager: THREE.LoadingManager;
   public animations:IAnimation = {}
   public mixer!: THREE.AnimationMixer;
+  public Objs :IObjs = {}
 
   constructor() {
     this.Html = new MyHtml();
@@ -43,6 +46,8 @@ export class Loading {
         this.fbxLoader.load("animations/Running.fbx", (a) => {
           this.GetAnimations("Run", a);
         });
+        this.fbxLoader.load("PineTree_1.fbx", (obj)=> this.LoadFBXModel("Tree", obj))
+        this.fbxLoader.load("Grass_2.fbx", (obj)=> this.LoadFBXModel("Grass", obj))
       },
     );
   }
@@ -52,5 +57,8 @@ export class Loading {
     const clip = animation.animations[0];
     const action = this.mixer.clipAction(clip);
     this.animations[name] = action
+  }
+  private LoadFBXModel(name: string, obj:THREE.Group){
+    this.Objs[name] = obj
   }
 }
