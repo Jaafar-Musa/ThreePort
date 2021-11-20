@@ -23,15 +23,14 @@ export class Character {
   private Init(): void {
     this.character.scale.setScalar(0.1);
     this.character.position.set(0, 0, -90);
-    // this.character.rotateY
     this.character.traverse((c) => {
       c.castShadow = true;
+      
     });
     this.scene.add(this.character);
     this.States.SetState("Idle")
   }
   public Update(t:number) {
-    // console.log(t)
     //Handle animations
     if(this.States){
       this.States.Update(this.inputs.movements)
@@ -69,7 +68,6 @@ export class Character {
     forward.normalize()
     forward.multiplyScalar(velocity.z)
     this.character.position.add(forward)
-    // console.log(this.character.position)
   }
 }
 

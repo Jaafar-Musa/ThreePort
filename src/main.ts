@@ -1,5 +1,5 @@
 import "./css/style.css";
-import { Loading, MyCamera, Character, World } from "./Scripts";
+import { Loading, MyCamera, Character, World, } from "./Scripts";
 
 import * as THREE from "three";
 
@@ -8,6 +8,7 @@ class Main {
   private renderer: THREE.WebGLRenderer;
   private MyCamera!: MyCamera;
   private Character!: Character;
+  private world !: World
   private Loading: Loading;
   private previousRAF: number | null;
 
@@ -43,12 +44,14 @@ class Main {
   }
 
   private RenderItems(): void {
-    new World(this.scene,this.Loading.Objs)
     this.Character = new Character(
       this.Loading.character,
       this.scene,
       this.Loading.animations
     );
+
+    this.world=  new World(this.scene,this.Loading.Objs,this.Character.character)
+    // new Collisions(this.Character.character)
 
     this.MyCamera = new MyCamera(this.scene, this.Character.character)
 
@@ -66,6 +69,7 @@ class Main {
     const cube = new THREE.Mesh(CubeGeometry, CubeMaterial);
     cube.position.set(-6, 0, 150);
     cube.add(new THREE.AxesHelper(10));
+    // console.log(cube)
     this.scene.add(cube);
   }
 
@@ -92,6 +96,7 @@ class Main {
     if (this.MyCamera) {
       this.MyCamera.Update(t);
     }
+    this.world.Update()
   }
 
   private OnWindowResize(): void {
