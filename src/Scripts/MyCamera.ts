@@ -25,6 +25,7 @@ export class MyCamera {
     }
 
     Update(tc:number){
+        //550
         let idealOffSet = this.Ideals(-10,25,-25)
         let idealLookat = this.Ideals(-10,5,30)
 

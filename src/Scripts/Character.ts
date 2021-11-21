@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Group } from "three";
+import { Box3, Group } from "three";
 import { MyCharacterFSM } from ".";
 import { IAnimation } from "./Loading";
 
@@ -9,11 +9,13 @@ export class Character {
   private inputs:Keypresses;
   public States:MyCharacterFSM
   public animations:IAnimation
+  collidables:Box3[]
   // public Mycamera!:MyCamera;
-  constructor(char: Group, scene: THREE.Scene, animation:IAnimation) {
+  constructor(char: Group, scene: THREE.Scene, animation:IAnimation, collidables:Box3[]) {
     this.character = char;
     this.scene = scene;
     this.animations = animation
+    this.collidables = collidables
 
     this.inputs = new Keypresses()
     this.States = new MyCharacterFSM(this.animations)
@@ -30,15 +32,26 @@ export class Character {
     this.scene.add(this.character);
     this.States.SetState("Idle")
   }
+  Collision(mv:THREE.Vector3){
+    let playerBox = new THREE.Box3()
+    let potentialPosition = this.character.clone()
+    potentialPosition.position.add(mv)
+    playerBox.setFromObject(potentialPosition)
+    for(let o of this.collidables){
+      if(o.intersectsBox(playerBox)){
+        return true
+      }
+    }
+    return false
+  }
   public Update(t:number) {
     //Handle animations
     if(this.States){
       this.States.Update(this.inputs.movements)
     }
-
     // Handle movements
     // const deceleration = new THREE.Vector3(-0.01, -0.1, -0.01);
-    const velocity = new THREE.Vector3(0, 0, 0);
+    let velocity = 0.0
     const acceleration = new THREE.Vector3(1, 1, 0.5);
     const axis = new THREE.Vector3(0,1,0) 
     const quaternion = new THREE.Quaternion()
@@ -49,25 +62,28 @@ export class Character {
     // )
 
     if(this.inputs.movements.forward){
-        velocity.z += acceleration.z
+        velocity += acceleration.z
     }
     if(this.inputs.movements.backwards){
-        velocity.z -= acceleration.z
+        velocity -= acceleration.z
     }
     if(this.inputs.movements.left || this.inputs.movements.right){
       quaternion.setFromAxisAngle(axis, this.inputs.movements.left ? -degreeOfRotation : degreeOfRotation)
       rotation.multiply(quaternion)
     }
     if(this.inputs.movements.sprint){
-        velocity.z *=  3
+        velocity *=  3
     }
     this.character.quaternion.copy(rotation)
 
     const forward = new THREE.Vector3(0,0,1)
     forward.applyQuaternion(rotation)
     forward.normalize()
-    forward.multiplyScalar(velocity.z)
-    this.character.position.add(forward)
+    forward.multiplyScalar(velocity)
+
+    if(!this.Collision(forward)){
+      this.character.position.add(forward)
+    }
   }
 }
 

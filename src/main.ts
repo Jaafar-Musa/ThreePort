@@ -34,6 +34,7 @@ class Main {
 
     // Loading done
     this.Loading.manager.onLoad = () => {
+      console.log("loaded")
       let btn = document.querySelector<HTMLButtonElement>("button");
       btn!.disabled = false;
       btn?.addEventListener("click", () => {
@@ -44,13 +45,15 @@ class Main {
   }
 
   private RenderItems(): void {
+    this.world=  new World(this.scene,this.Loading.Objs,)
+
     this.Character = new Character(
       this.Loading.character,
       this.scene,
-      this.Loading.animations
+      this.Loading.animations,
+      this.world.collidableObjs
     );
 
-    this.world=  new World(this.scene,this.Loading.Objs,this.Character.character)
     // new Collisions(this.Character.character)
 
     this.MyCamera = new MyCamera(this.scene, this.Character.character)
@@ -96,7 +99,7 @@ class Main {
     if (this.MyCamera) {
       this.MyCamera.Update(t);
     }
-    this.world.Update()
+    // this.world.Update()
   }
 
   private OnWindowResize(): void {

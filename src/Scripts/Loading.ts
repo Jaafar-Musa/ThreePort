@@ -26,7 +26,7 @@ export class Loading {
     this.fbxLoader.setPath("/src/assets/");
 
     this.Init();
-    this.Html.AddLoadingBtn();
+    this.Html.AddLoadingPage();
   }
 
   private Init() {
@@ -46,8 +46,12 @@ export class Loading {
         this.fbxLoader.load("animations/Running.fbx", (a) => {
           this.GetAnimations("Run", a);
         });
-        this.fbxLoader.load("PineTree_1.fbx", (obj)=> this.LoadFBXModel("Tree", obj))
-        this.fbxLoader.load("Grass_2.fbx", (obj)=> this.LoadFBXModel("Grass", obj))
+        // setTimeout(()=>{
+          this.fbxLoader.load("PineTree_1.fbx", (obj)=> this.LoadFBXModel("Tree", obj))
+          this.fbxLoader.load("Grass_2.fbx", (obj)=> this.LoadFBXModel("Grass", obj))
+          this.fbxLoader.load("test2.fbx", (obj)=> this.LoadFBXModel("py", obj))
+        // },10000)
+
       },
     );
   }
