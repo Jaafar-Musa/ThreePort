@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Box3, Group } from "three";
-import { MyCharacterFSM } from ".";
+import { MyCharacterFSM, World } from ".";
 import { IAnimation } from "./Loading";
 
 export class Character {
@@ -9,13 +9,13 @@ export class Character {
   private inputs:Keypresses;
   public States:MyCharacterFSM
   public animations:IAnimation
-  collidables:Box3[]
+  world:World
   // public Mycamera!:MyCamera;
-  constructor(char: Group, scene: THREE.Scene, animation:IAnimation, collidables:Box3[]) {
+  constructor(char: Group, scene: THREE.Scene, animation:IAnimation, world:World) {
     this.character = char;
     this.scene = scene;
     this.animations = animation
-    this.collidables = collidables
+    this.world = world
 
     this.inputs = new Keypresses()
     this.States = new MyCharacterFSM(this.animations)
@@ -37,14 +37,24 @@ export class Character {
     let potentialPosition = this.character.clone()
     potentialPosition.position.add(mv)
     playerBox.setFromObject(potentialPosition)
-    for(let o of this.collidables){
+    for(let o of this.world.collidableObjs){
       if(o.intersectsBox(playerBox)){
         return true
       }
     }
     return false
   }
+  // Interact(){
+  //   let playerBox = new THREE.Box3()
+  //   playerBox.setFromObject(this.character)
+  //   for(let o of this.world.interactables){
+  //     if(o.intersectsBox(playerBox)){
+  //       console.log("tesyt")
+  //     }
+  //   }
+  // }
   public Update(t:number) {
+    // this.Interact()
     //Handle animations
     if(this.States){
       this.States.Update(this.inputs.movements)
@@ -56,7 +66,7 @@ export class Character {
     const axis = new THREE.Vector3(0,1,0) 
     const quaternion = new THREE.Quaternion()
     const rotation = this.character.quaternion.clone()
-    const degreeOfRotation = Math.PI/45
+    const degreeOfRotation = Math.PI/90
     // const frameDeceleration = new THREE.Vector3(
         
     // )

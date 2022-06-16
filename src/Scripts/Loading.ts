@@ -49,7 +49,8 @@ export class Loading {
         // setTimeout(()=>{
           this.fbxLoader.load("PineTree_1.fbx", (obj)=> this.LoadFBXModel("Tree", obj))
           this.fbxLoader.load("Grass_2.fbx", (obj)=> this.LoadFBXModel("Grass", obj))
-          this.fbxLoader.load("test2.fbx", (obj)=> this.LoadFBXModel("py", obj))
+          this.fbxLoader.load("languages/test2.fbx", (obj)=> this.LoadFBXModel("Py", obj))
+          this.fbxLoader.load("languages/html.fbx", (obj)=> this.LoadFBXModel("Html", obj))
         // },10000)
 
       },

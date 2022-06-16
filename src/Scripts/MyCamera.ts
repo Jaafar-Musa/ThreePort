@@ -23,6 +23,9 @@ export class MyCamera {
         vector.add(this.character.position)
         return vector
     }
+    private Selectable(){
+        let raycaster = new THREE.Raycaster()
+    }
 
     Update(tc:number){
         //550

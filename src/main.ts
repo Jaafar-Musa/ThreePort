@@ -1,5 +1,5 @@
 import "./css/style.css";
-import { Loading, MyCamera, Character, World, } from "./Scripts";
+import { Loading, MyCamera, Character, World } from "./Scripts";
 
 import * as THREE from "three";
 
@@ -8,7 +8,7 @@ class Main {
   private renderer: THREE.WebGLRenderer;
   private MyCamera!: MyCamera;
   private Character!: Character;
-  private world !: World
+  private world!: World;
   private Loading: Loading;
   private previousRAF: number | null;
 
@@ -30,50 +30,61 @@ class Main {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Config scene
-    this.scene.background = new THREE.Color(0xC6FCFF);
+    this.scene.background = new THREE.Color(0xc6fcff);
 
     // Loading done
     this.Loading.manager.onLoad = () => {
-      console.log("loaded")
-      let btn = document.querySelector<HTMLButtonElement>("button");
-      btn!.disabled = false;
-      btn?.addEventListener("click", () => {
-        this.RenderItems();
-        this.Loading.Html.RemoveLoadingBtn();
-      });
+      console.log("loaded");
+      this.RenderItems();
     };
   }
 
   private RenderItems(): void {
-    this.world=  new World(this.scene,this.Loading.Objs,)
-
+    
+    this.world = new World(this.scene, this.Loading.Objs);
     this.Character = new Character(
       this.Loading.character,
       this.scene,
       this.Loading.animations,
-      this.world.collidableObjs
-    );
+      this.world
+      );
+      this.MyCamera = new MyCamera(this.scene, this.Character.character);
 
     // new Collisions(this.Character.character)
 
-    this.MyCamera = new MyCamera(this.scene, this.Character.character)
 
     // this.AddLight_(0, 10, 2);
-      this.scene.add(new THREE.AmbientLight(0xffffff,2))
     //Request animation
+
+      let light = new THREE.DirectionalLight(0xffffff,1.2)
+      light.position.set(0,40,260)
+      light.target.position.set(0,0,0)
+      light.castShadow = true
+      light.shadow.bias = -0.001;
+      // light.shadow.mapSize.width = 4096;
+      // light.shadow.mapSize.height = 4096;
+      // light.shadow.camera.far = 200.0;
+      // light.shadow.camera.near = 1.0;
+      // light.shadow.camera.left = 50;
+      // light.shadow.camera.right = -50;
+      // light.shadow.camera.top = 50;
+      // light.shadow.camera.bottom = -50;
+      this.scene.add(light)
+    // this.scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+    this.scene.add(new THREE.HemisphereLight(0xB1E1FF,0x3f9b0b,1.2))
+
     this.RAF();
 
     // Responsive
     window.addEventListener("resize", () => this.OnWindowResize());
 
-    //* REFERENCE A CUBE FOR TESTING PURPOSES
-    const CubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ee0 });
-    const CubeGeometry = new THREE.BoxGeometry();
-    const cube = new THREE.Mesh(CubeGeometry, CubeMaterial);
-    cube.position.set(-6, 0, 150);
-    cube.add(new THREE.AxesHelper(10));
-    // console.log(cube)
-    this.scene.add(cube);
+    //start
+    let btn = document.querySelector<HTMLButtonElement>("button");
+    btn!.disabled = false;
+    btn?.addEventListener("click", () => {
+      this.Loading.Html.RemoveLoadingBtn();
+    });
+
   }
 
   private RAF(): void {
@@ -99,7 +110,7 @@ class Main {
     if (this.MyCamera) {
       this.MyCamera.Update(t);
     }
-    // this.world.Update()
+    this.world.Update(this.MyCamera.camera)
   }
 
   private OnWindowResize(): void {
@@ -107,15 +118,6 @@ class Main {
     this.MyCamera.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
-
-  // private AddLight_(...pos: number[]) {
-  //   const color = 0xffffff;
-  //   const intensity = 1;
-  //   const light = new THREE.DirectionalLight(color, intensity);
-  //   light.position.set(pos[0], pos[1], pos[2]);
-  //   light.target.position.set(1,1,1)
-  //   this.scene.add(light);
-  // }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

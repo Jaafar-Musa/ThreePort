@@ -62,4 +62,7 @@ body{
   font-size: 28px;
   border: 3px solid black;
 }
-
+.loadingScreen__buttons > button:hover{
+  background-color: rgb(170, 175, 248);
+  transform: scale(1.08,1.08);
+}

@@ -23,7 +23,7 @@ export default class Html {
     const pixels = document.querySelectorAll(".pixel");
     for (let i =0;i< pixels.length; i++) {
       (pixels[i] as HTMLDivElement).style.animationDelay =
-        Math.random() * 5000 + "ms";
+        Math.ceil(Math.random() * 5000)  + "ms";
     }
   }
   RemoveLoadingBtn() {

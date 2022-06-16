@@ -4,20 +4,28 @@ import {
   MeshPhongMaterial,
   PlaneGeometry,
 } from "three";
+import * as THREE from "three"
 import { IObjs } from "./Loading";
+import { repo } from "../repo";
 
+// type Box3 = {
+//   name:string
+// }
 export class World {
+  private raycaster = new THREE.Raycaster()
+  private mouse = new THREE.Vector2()
   private scene: THREE.Scene;
   private objs: IObjs;
-   collidableObjs: Box3[] = [];
+  collidableObjs: Box3[] = [];
+  interactables:THREE.Object3D[]=[]
+  keypress:null | string = null
   private coords: [x: number, z: number][] = [
-
     [150, -260],
     [-150, -260],
     [-300, 0],
     [-150, 260],
     [150, 260],
-    [300,0],
+    [300, 0],
   ];
   constructor(scene: THREE.Scene, objs: IObjs, ) {
     this.scene = scene;
@@ -27,9 +35,31 @@ export class World {
   private Init() {
     this.AddFloor();
     // this.AddTrees();
-    this.AddObj()
+    this.AddLanguages("Py");
     this.AddMapBoarder();
     // this.Collision()
+
+
+    //Set up mouse 
+    window.addEventListener('mousemove', (event)=>{
+      this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+      this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    
+    }, false)
+    window.addEventListener("keyup",(event)=>{
+      switch(event.key){
+        case "Enter":
+        case "q":
+        case "Q":
+        case "E":
+        case "e":
+        case "Escape":
+        case "Backspace":
+          this.keypress = event.key   
+      }
+      console.log(event.key)
+    }, false)
+
   }
   private AddFloor() {
     let floorGeo = new PlaneGeometry(1300, 1800, 40, 50);
@@ -41,15 +71,54 @@ export class World {
     this.scene.add(floor);
     // floor.p
   }
-  private AddObj() {
-    let tree = this.objs["py"];
-    tree.position.set(0, 0, 40);
-    tree.scale.setScalar(0.5);
-    let box = new Box3()
-    box.setFromObject(tree)
-    this.collidableObjs.push(box);
-    this.scene.add(tree);
+
+  public AddLanguages(name:string) {
+    let language = this.objs[name];
+    language.position.set(-180, 0, 0);
+    language.scale.setScalar(0.2);
+    language.rotateY(Math.PI / 2);
+    // let box = new Box3();
+    // box.setFromObject(language);
+    language.name = name
+    this.interactables.push(language);
+    this.scene.add(language);
+
   }
+  private UpdateMouse(camera:THREE.Camera){
+    this.raycaster.setFromCamera( this.mouse,camera)
+    // console.log()
+    let intersectsWith = this.raycaster.intersectObjects(this.interactables)
+    if(intersectsWith.length > 0){
+      // console.log(repo)
+      this.isLang()
+      console.log(intersectsWith[0])
+
+    }
+  }
+  isLang(){
+    for(let a in repo){
+      console.log(a)
+    }
+  }
+  Update(camera:THREE.Camera){
+    this.UpdateMouse(camera)
+  }
+    //? cos theta = x, sin theta = y
+    // let r = 10;
+    // let points: Vector3[] = [];
+    // for (let i = 0; i < 360; i++) {
+    //   let oneDeg = Math.PI;
+    //   points.push(
+    //     new Vector3(Math.sin(i * oneDeg) * r, Math.cos(i * oneDeg) * r, 0)
+    //   );
+    // }
+    // circleGeo.setFromPoints(points);
+    // // console.log(circleGeo)
+
+    // let circle = new Line(circleGeo, circleMaterial);
+
+    // // let loopCirc = new LineLoop(circleGeo,circleMaterial)
+
   private AddMapBoarder() {
     //Boarder the map in trees
     //In a hex shape
@@ -66,9 +135,13 @@ export class World {
       let cloneTree = tree.clone();
       cloneTree.position.set(x, 0, z);
       cloneTree.scale.setScalar(0.3);
-      let box = new Box3()
-      box.setFromObject(cloneTree)
-      this.collidableObjs.push(box)
+      cloneTree.castShadow = true
+      let box = new Box3();
+
+      // let m = new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true})
+      // let b = new THREE.Mesh(box,m)
+      box.setFromObject(cloneTree);
+      this.collidableObjs.push(box);
       this.scene.add(cloneTree);
     };
 
@@ -77,7 +150,7 @@ export class World {
       let c1 = this.coords[i];
       let c2 = this.coords[j];
       let z = lineEq(c1, c2);
-      
+
       let smallerVal = Math.min(c1[0], c2[0]);
       let largerVal = Math.max(c1[0], c2[0]);
       while (smallerVal < largerVal) {
@@ -87,43 +160,6 @@ export class World {
       }
     }
   }
-  // Update() {
-  //   this.Collision();
-  //   // console.log(this.collidableObjs)
-  // }
-  //? try detecting collision with the origin being the shoes
-  //? For smaller objs, and I can't be bothered to rewrite..maybe when refactoring.
-  private Collision() {
-    // let raycaster = new Raycaster(this.character.position.clone())
-    // let col = raycaster.intersectObjects(this.collidableObjs)
-    // let char: any = this.character.clone().children[1].children[2]; //.geometry.attributes.position.array
-    // let pver: [] =
-    //   char.geometry.attributes.position.array;
-    // let vecs = [];
-    // for (let i = 0; i < pver.length / 3; i++) {
-    //   let v = new Vector3(pver[i * 3], pver[i * 3 + 1], pver[i * 3 + 2]);
-    //   let wv = this.character.localToWorld(v)
-    //   vecs.push(wv);
-    // }
-    // // this.character.localToWorld()
-    // for(let i = 0; i < vecs.length; i++){
-    //     let vert = vecs[i].applyMatrix4(char.matrix)
-    //     let dirVect = vert.sub(this.character.position)
-    //     console.log(dirVect)
-    // }
 
-    // console.log(vecs[0].applyMatrix4(char.matrix));
-    // console.log(char.matrix)
-  }
+
 }
-
-// export class Collisions{
-//   constructor(){
-//     this.character = character
-
-//     this.Init()
-//   }
-//   Init(){
-//     let ray = new Ray(this.character.position,)
-//   }
-// }

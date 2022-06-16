@@ -3,7 +3,7 @@ import { IAnimation } from "./Loading";
 
 interface IState {
   name: string;
-  Enter: (previousState:IState | undefined) => void;
+  Enter: (previousState:IState | undefined, ) => void;
 //   Exit: () => void;
   Update: (input:IMovements) => void;
 }
@@ -80,17 +80,18 @@ class Walk implements IState {
   }
   Enter(previousState:IState | undefined): void {
       let animation = this.parent.loadedAnimations["Walk"]
+      
       if(previousState){
         animation.enabled = true;
         const prevAnim = this.parent.loadedAnimations[previousState.name]
-        if(previousState.name = "Run"){
-          let r= animation.getClip().duration / prevAnim.getClip().duration
-          animation.time = r * prevAnim.time
-        }else{
+        // if(previousState.name = "Run"){
+        //   let r= animation.getClip().duration / prevAnim.getClip().duration
+        //   animation.time = r * prevAnim.time
+        // }else{
           animation.time = 0.0;
           animation.setEffectiveTimeScale(1.0);
           animation.setEffectiveWeight(1.0);
-        }
+        // }
         animation.crossFadeFrom(prevAnim,0.1,true)
         animation.play()
       }else{
@@ -119,14 +120,14 @@ class Run implements IState {
     if(previousState){
       animation.enabled = true
       let prevAnim = this.parent.loadedAnimations[previousState.name]
-      if(previousState.name = "Walk"){
-        let r= animation.getClip().duration / prevAnim.getClip().duration
-        animation.time = r * prevAnim.time
-      }else{
+      // if(previousState.name = "Walk"){
+      //   let r= animation.getClip().duration / prevAnim.getClip().duration
+      //   animation.time = r * prevAnim.time
+      // }else{
         animation.time = 0.0;
         animation.setEffectiveWeight(1.0)
         animation.setEffectiveTimeScale(1.0)
-      }
+      // }
       animation.crossFadeFrom(prevAnim,0.5,true)
       animation.play()
       // if(previousState.name == "Walk")
@@ -141,6 +142,8 @@ class Run implements IState {
               this.parent.SetState("Walk")
           }
           this.parent.SetState("Idle")
+      }else if(inputs.sprint && !inputs.forward){
+        this.parent.SetState("Idle")
       }
   }
 }
