@@ -1,2 +1,2 @@
-# Portfolio
-My portfolio built with three js
+Playing around to test three js
+
